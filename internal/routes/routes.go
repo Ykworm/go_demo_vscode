@@ -22,8 +22,7 @@ type User struct {
 
 func SetupRoutes(router *gin.Engine, handler *handlers.Handler) {
 	// router.GET("/", handler.GetHome)
-	router.GET("/getBalnce", balanceHandler)
-
+	router.GET("/getBalance", balanceHandler)
 	router.GET("/healthcheck", func(c *gin.Context) {
 
 		c.JSON(200, "ok")
