@@ -124,8 +124,19 @@ func SetupRoutes(router *gin.Engine, handler *handlers.Handler) {
 func GetUser(c *gin.Context) {
 	db := c.MustGet("db").(*sql.DB)
 	id := c.Param("id")
-	// Copilot 会在此处检测是否使用 Exec("SELECT * FROM users WHERE id=?", id)
-	db.Exec(fmt.Sprintf("SELECT * FROM users WHERE id=%s", id))
+	// Use a parameterized query to prevent SQL injection
+	row := db.QueryRow("SELECT * FROM users WHERE id=?", id)
+	var user User
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		}
+		return
+	}
+	c.JSON(http.StatusOK, user)
 }
 
 // 复杂嵌套查询订单
