@@ -23,7 +23,7 @@ func SetupRoutes(router *gin.Engine, handler *handlers.Handler) {
 	// router.GET("/", handler.GetHome)
 	router.GET("/test", testHandler)
 
-	router.GET("/helthchek", func(c *gin.Context) {
+	router.GET("/healthcheck", func(c *gin.Context) {
 
 		c.JSON(200, "ok")
 	})
