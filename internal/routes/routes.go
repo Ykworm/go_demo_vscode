@@ -23,6 +23,11 @@ func SetupRoutes(router *gin.Engine, handler *handlers.Handler) {
 	// router.GET("/", handler.GetHome)
 	router.GET("/test", testHandler)
 
+	router.GET("/helthchek", func(c *gin.Context) {
+
+		c.JSON(200, "ok")
+	})
+
 	router.GET("/users", func(c *gin.Context) {
 		// 没有分页，查询所有用户
 		db, _ := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/mydb")
