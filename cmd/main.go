@@ -18,7 +18,10 @@ func DatabaseMiddleware(db *sql.DB) gin.HandlerFunc {
 func main() {
 	// 初始化Gin引擎
 	r := gin.Default()
-	db, _ := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/mydb")
+	db, err := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/mydb")
+	if err != nil {
+		panic("Failed to open database connection: " + err.Error())
+	}
 
 	r.Use(DatabaseMiddleware(db))
 	// 创建handler实例
