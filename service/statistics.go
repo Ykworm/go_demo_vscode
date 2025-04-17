@@ -2,6 +2,7 @@ package service
 
 import (
 	"math"
+	"sync"
 )
 
 // CalculateStandardDeviation computes the standard deviation of a given array of numbers.
@@ -26,4 +27,18 @@ func CalculateStandardDeviation(numbers []float64) float64 {
 
 	// Return the square root of the variance (standard deviation)
 	return math.Sqrt(variance)
+}
+
+func ProcessData() {
+	var wg sync.WaitGroup
+	data := make([]int, 0) // REVIEW: 共享切片未加锁
+
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			data = append(data, i) // 竞态条件
+		}()
+	}
+	wg.Wait()
 }

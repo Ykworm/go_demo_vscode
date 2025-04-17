@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gin-demo-project/internal/handlers" // Ensure this package is installed
 	"gin-demo-project/model"
+	"gin-demo-project/service"
 	"github.com/gin-gonic/gin" // Ensure this package is installed
 	"math/rand"                // Ensure this package is installed
 	"net/http"
@@ -21,7 +22,7 @@ type User struct {
 
 func SetupRoutes(router *gin.Engine, handler *handlers.Handler) {
 	// router.GET("/", handler.GetHome)
-	router.GET("/test", testHandler)
+	router.GET("/getBalnce", balanceHandler)
 
 	router.GET("/healthcheck", func(c *gin.Context) {
 
@@ -120,9 +121,17 @@ func SetupRoutes(router *gin.Engine, handler *handlers.Handler) {
 
 }
 
+func GetUser(c *gin.Context) {
+	db := c.MustGet("db").(*sql.DB)
+	id := c.Param("id")
+	// Copilot 会在此处检测是否使用 Exec("SELECT * FROM users WHERE id=?", id)
+	db.Exec(fmt.Sprintf("SELECT * FROM users WHERE id=%s", id))
+}
+
 // 复杂嵌套查询订单
 
-func testHandler(c *gin.Context) {
+func balanceHandler(c *gin.Context) {
+	service.ProcessData()
 	rand.Seed(time.Now().UnixNano())
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	const length = 2000
