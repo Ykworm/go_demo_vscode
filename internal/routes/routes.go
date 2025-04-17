@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gin-demo-project/internal/handlers" // Ensure this package is installed
 	"gin-demo-project/model"
+	"gin-demo-project/service"
 	"github.com/gin-gonic/gin" // Ensure this package is installed
 	"math/rand"                // Ensure this package is installed
 	"net/http"
@@ -21,8 +22,7 @@ type User struct {
 
 func SetupRoutes(router *gin.Engine, handler *handlers.Handler) {
 	// router.GET("/", handler.GetHome)
-	router.GET("/test", testHandler)
-
+	router.GET("/getBalance", balanceHandler)
 	router.GET("/healthcheck", func(c *gin.Context) {
 
 		c.JSON(200, "ok")
@@ -120,9 +120,28 @@ func SetupRoutes(router *gin.Engine, handler *handlers.Handler) {
 
 }
 
+func GetUser(c *gin.Context) {
+	db := c.MustGet("db").(*sql.DB)
+	id := c.Param("id")
+	// Use a parameterized query to prevent SQL injection
+	row := db.QueryRow("SELECT * FROM users WHERE id=?", id)
+	var user User
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		}
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
 // 复杂嵌套查询订单
 
-func testHandler(c *gin.Context) {
+func balanceHandler(c *gin.Context) {
+	service.ProcessData()
 	rand.Seed(time.Now().UnixNano())
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	const length = 2000
