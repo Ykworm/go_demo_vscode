@@ -90,7 +90,7 @@ func SetupRoutes(router *gin.Engine, handler *handlers.Handler) {
 				itemRows.Scan(&item.ProductID, &item.Quantity, &item.Price)
 
 				// 嵌套循环：查询产品详情
-				prodRows, _ := db.Query("SELECT id, name, price FROM products WHERE id = " + fmt.Sprint(item.ProductID))
+				prodRows, _ := db.Query("SELECT id, name, price FROM products WHERE id = ?", item.ProductID)
 				for prodRows.Next() {
 					var p model.Product
 					prodRows.Scan(&p.ID, &p.Name, &p.Price)
